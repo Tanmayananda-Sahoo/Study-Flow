@@ -1,0 +1,117 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    @apply bg-paper font-sans text-ink antialiased;
+  }
+
+  /* Thin scrollbar */
+  ::-webkit-scrollbar {
+    width: 4px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-border rounded-full;
+  }
+
+  input::placeholder {
+    @apply text-ink-muted opacity-60;
+  }
+}
+
+@layer components {
+  /* Card base */
+  .card {
+    @apply bg-white border border-border rounded-2xl p-5 shadow-card
+           transition-all duration-150;
+  }
+  .card:hover {
+    @apply shadow-card-hover -translate-y-0.5;
+  }
+
+  /* Section label above card contents */
+  .card-label {
+    @apply text-2xs font-semibold text-ink-muted uppercase tracking-label mb-4;
+  }
+
+  /* Primary accent button */
+  .btn-primary {
+    @apply bg-accent text-white text-base font-medium
+           px-4 py-2 rounded-lg cursor-pointer border-0
+           transition-opacity duration-150 hover:opacity-90 active:opacity-80;
+  }
+
+  /* Ghost / outline button */
+  .btn-ghost {
+    @apply bg-transparent text-ink-muted text-base font-normal
+           px-4 py-2 rounded-lg cursor-pointer
+           border border-border
+           transition-all duration-150
+           hover:bg-paper hover:text-ink;
+  }
+
+  /* Sidebar nav button */
+  .sidebar-item {
+    @apply flex items-center gap-2.5 w-full text-left
+           px-2.5 py-2 rounded-md text-base font-normal
+           text-ink cursor-pointer border-0
+           transition-all duration-150
+           hover:bg-accent-light hover:text-accent;
+  }
+  .sidebar-item.active {
+    @apply bg-accent-light text-accent font-medium;
+  }
+
+  /* Top nav link */
+  .nav-link {
+    @apply text-base font-normal text-ink-muted
+           px-3 py-1.5 rounded-md cursor-pointer border-0
+           bg-transparent transition-all duration-150
+           hover:bg-accent-light hover:text-accent;
+  }
+  .nav-link.active {
+    @apply bg-accent-light text-accent font-medium;
+  }
+
+  /* Priority pill tag */
+  .tag-high {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full
+           text-xs font-medium bg-orange-50 text-orange-700;
+  }
+  .tag-med {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full
+           text-xs font-medium bg-accent-light text-accent;
+  }
+  .tag-low {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full
+           text-xs font-medium bg-green-50 text-green-700;
+  }
+
+  /* Status live badge */
+  .badge-live {
+    @apply text-xs font-medium px-2.5 py-0.5 rounded-full
+           bg-green-50 text-green-700;
+  }
+
+  /* AI badge */
+  .badge-ai {
+    @apply text-xs font-medium px-2.5 py-0.5 rounded-full
+           bg-accent-light text-accent;
+  }
+}
