@@ -7,10 +7,9 @@ const SIDEBAR_ITEMS = [
   { id: 'timetable',     label: 'Timetable',       icon: 'timetable' },
   { id: 'tasks',         label: 'Study Tasks',     icon: 'tasks'     },
   { id: 'schedule',      label: 'Smart Schedule',  icon: 'schedule'  },
-  { id: 'notifications', label: 'Notifications',   icon: 'bell'      },
 ]
 
-export default function Sidebar({ activePage, setActivePage }) {
+const Sidebar = ({ activePage, setActivePage }) => {
   return (
     <aside className="w-sidebar shrink-0 bg-white border-r border-border flex flex-col gap-1 p-4 min-h-content">
 
@@ -57,3 +56,6 @@ export default function Sidebar({ activePage, setActivePage }) {
     </aside>
   )
 }
+
+
+export default Sidebar;

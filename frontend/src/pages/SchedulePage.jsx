@@ -21,7 +21,7 @@ const LEGEND = [
   { type: 'break', dot: 'bg-border',     label: 'Break'  },
 ]
 
-export default function SchedulePage() {
+const SchedulePage = () => {
   return (
     <div>
       {/* Header */}
@@ -57,3 +57,5 @@ export default function SchedulePage() {
     </div>
   )
 }
+
+export default SchedulePage

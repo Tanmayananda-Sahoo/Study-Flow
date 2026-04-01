@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Icon from '../components/Icon'
 
-export default function LoginPage({ onLogin }) {
+export default function LoginPage({ onLogin, onGoSignup }) {
   const [email,    setEmail]    = useState('')
   const [password, setPassword] = useState('')
   const [focused,  setFocused]  = useState(null)
@@ -78,7 +78,7 @@ export default function LoginPage({ onLogin }) {
 
         <p className="mt-5 text-center text-xs text-ink-muted">
           Don&apos;t have an account?{' '}
-          <span className="text-accent font-medium cursor-pointer hover:underline">Create one</span>
+          <span onClick={onGoSignup} className="text-accent font-medium cursor-pointer hover:underline">Create one</span>
         </p>
       </div>
 

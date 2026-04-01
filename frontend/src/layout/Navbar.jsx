@@ -36,10 +36,10 @@ export default function Navbar({ activePage, setActivePage, onLogout }) {
 
       {/* Right actions */}
       <div className="flex items-center gap-1">
-        <button className="nav-link p-1.5">
-          <Icon name="bell" size={16} />
-        </button>
-        <button className="nav-link p-1.5">
+        <button 
+        className="nav-link p-1.5"
+        onClick={() => setActivePage('account')}
+        >
           <Icon name="user" size={16} />
         </button>
         <button onClick={onLogout} className="nav-link p-1.5">

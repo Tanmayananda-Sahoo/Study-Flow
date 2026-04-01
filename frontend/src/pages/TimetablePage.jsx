@@ -2,7 +2,7 @@
 
 import TimetableGrid from '../components/TimetableGrid'
 
-export default function TimetablePage() {
+const TimetablePage = () => {
   return (
     <div>
       <h1 className="text-3xl font-semibold text-ink tracking-tighter mb-0.5">Timetable</h1>
@@ -11,3 +11,5 @@ export default function TimetablePage() {
     </div>
   )
 }
+
+export default TimetablePage;

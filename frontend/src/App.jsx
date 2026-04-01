@@ -3,14 +3,16 @@
 
 import { useState } from 'react'
 
-import Navbar   from './layout/Navbar'
-import Sidebar  from './layout/Sidebar'
+import Navbar    from './layout/Navbar'
+import Sidebar   from './layout/Sidebar'
 
-import LoginPage    from './pages/LoginPage'
+import LoginPage     from './pages/LoginPage'
+import SignupPage    from './pages/SignupPage'
 import DashboardPage from './pages/DashboardPage'
 import TimetablePage from './pages/TimetablePage'
 import TasksPage     from './pages/TasksPage'
 import SchedulePage  from './pages/SchedulePage'
+import AccountPage   from './pages/AccountPage'
 
 function renderPage(page) {
   switch (page) {
@@ -18,16 +20,31 @@ function renderPage(page) {
     case 'timetable': return <TimetablePage />
     case 'tasks':     return <TasksPage />
     case 'schedule':  return <SchedulePage />
+    case 'account':   return <AccountPage />
     default:          return <DashboardPage />
   }
 }
 
 export default function App() {
-  const [loggedIn,   setLoggedIn]   = useState(false)
+  const [screen,     setScreen]     = useState('login')
   const [activePage, setActivePage] = useState('dashboard')
 
-  if (!loggedIn) {
-    return <LoginPage onLogin={() => setLoggedIn(true)} />
+  if (screen === 'login') {
+    return (
+      <LoginPage
+        onLogin={() => setScreen('app')}
+        onGoSignup={() => setScreen('signup')}
+      />
+    )
+  }
+
+  if (screen === 'signup') {
+    return (
+      <SignupPage
+        onSignup={() => setScreen('app')}
+        onGoLogin={() => setScreen('login')}
+      />
+    )
   }
 
   return (
@@ -35,7 +52,7 @@ export default function App() {
       <Navbar
         activePage={activePage}
         setActivePage={setActivePage}
-        onLogout={() => setLoggedIn(false)}
+        onLogout={() => { setScreen('login'); setActivePage('dashboard') }}
       />
 
       <div className="flex min-h-content">

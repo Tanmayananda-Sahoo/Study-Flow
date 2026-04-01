@@ -25,7 +25,7 @@ const CLASSES = [
   { day: 'Friday',    start: 5, span: 1, name: 'Office Hours',   room: 'Prof.Rm', color: 'green'  },
 ]
 
-export default function TimetableGrid() {
+const TimetableGrid = () => {
   return (
     <div className="bg-white border border-border rounded-3xl overflow-hidden">
       {/* Header row */}
@@ -85,3 +85,5 @@ export default function TimetableGrid() {
     </div>
   )
 }
+
+export default TimetableGrid;

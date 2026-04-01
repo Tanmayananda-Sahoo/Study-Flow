@@ -21,7 +21,7 @@ const FILTERS = [
   { id: 'done',    label: 'Completed'      },
 ]
 
-export default function TasksPage() {
+const TasksPage = () => {
   const [filter, setFilter] = useState('all')
 
   const filtered = ALL_TASKS.filter(t => {
@@ -80,3 +80,5 @@ export default function TasksPage() {
     </div>
   )
 }
+
+export default TasksPage

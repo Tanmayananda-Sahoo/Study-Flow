@@ -67,7 +67,7 @@ function TimelineEvent({ event, isLast }) {
   )
 }
 
-export default function ScheduleTimeline({ events }) {
+const ScheduleTimeline = ({ events }) => {
   return (
     <div className="flex flex-col">
       {events.map((event, i) => (
@@ -76,3 +76,5 @@ export default function ScheduleTimeline({ events }) {
     </div>
   )
 }
+
+export default ScheduleTimeline;
