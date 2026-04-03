@@ -1,24 +1,49 @@
 const Timetable = require("../models/timetableModel.cjs");
-const {convertToMinutes, sortSchedules, detectFreeSlots} = require('../utils/timeTable.cjs');
 
+//complete untested
 const addTimeTableEntry = async(req,res) => {
-    const {title, startTime, endTime, isRecurring} = req.body;
+    const {title, startTime, endTime, isRecurring, venue} = req.body;
 
-    if([title, startTime, endTime, isRecurring].some((field) => field.trim() == "")) {
+    if([title, startTime, endTime, isRecurring, venue].some((field) => field.trim() == "")) {
       return res.status(400)
       .json({
         message: 'All the fields are required.'
       })
     }
 
-    const date = new Date();
-    const dayOfTheWeek = date.getDay();
-    
-    
+    const userId = req.user._id;
+    if(!userId) {
+      return res.status("User is unauthorized to add time table.")
+    }
 
+    const today = new Date();
+    const todayDay = today.getDay();
+
+    const timeTable = await Timetable.create({
+      title,
+      startTime,
+      endTime,
+      venue,
+      dayOfWeek: isRecurring ? todayDay : null,
+      specificDate: isRecurring ? null: today
+    })
+
+    if(!timeTable) {
+      return res.status(400)
+      .json({
+        message: "There is a problem with creating time table. Please try once again."
+      })
+    }
+
+    return res.status(200)
+    .json({
+      message: "Time table created successfully.",
+      TimeTable: timeTable
+    })
 }
 
-const getDefaultSchedule = async (req, res) => {
+//complete untested
+const getTimeTable = async (req, res) => {
   try {
     const today = new Date();
     const todayDay = today.getDay();
@@ -26,27 +51,26 @@ const getDefaultSchedule = async (req, res) => {
     const startOfDay = new Date(today.setHours(0, 0, 0, 0));
     const endOfDay = new Date(today.setHours(23, 59, 59, 999));
 
-    const schedules = await Timetable.find({
+    const timeTable = await Timetable.find({
       userId: req.user._id,
       $or: [
         { dayOfWeek: todayDay, isRecurring: true },
-        {
-          specificDate: {
-            $gte: startOfDay,
-            $lte: endOfDay,
-          },
-        },
+        {specificDate: today},
       ],
+    }).sort({startTime: 1});
+
+    return res.status(200)
+    .json({
+      message: "Default time table fetched successfully.",
+      TimeTable: timeTable
     });
 
-    res.json(schedules);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-const getTodaySchedule = async(req,res) => {
-    
-}
 
-export {addTimeTableEntry, getDefaultSchedule, getTodaySchedule};
+
+
+export {addTimeTableEntry, getTimeTable, getTodaySchedule};

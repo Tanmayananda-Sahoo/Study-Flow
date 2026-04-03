@@ -19,14 +19,19 @@ const userSchema = new mongoose.Schema({
         minlength: [4, "Password should be of minimum 4 characters."],
         select: false
     },
-    role: {
-        type: String,
-        enum: ['Admin', 'Teacher', 'Student'],
-        default: 'Student'
-    },
     department: {
         type: String,
         required: [true, 'You are required to enter your department']
+    },
+    bio: {
+        type: String,
+        required: false,
+        default: null
+    },
+    academicYear: {
+        type: Number,
+        required: true,
+        enum: [1,2,3,4]
     }
 },{timestamps: true})
 

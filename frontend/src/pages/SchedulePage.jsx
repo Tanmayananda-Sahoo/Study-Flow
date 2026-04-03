@@ -27,16 +27,6 @@ const SchedulePage = () => {
       {/* Header */}
       <div className="flex items-start justify-between mb-0.5">
         <h1 className="text-3xl font-semibold text-ink tracking-tighter">Smart Schedule</h1>
-        <div className="flex gap-2">
-          <button className="btn-ghost flex items-center gap-1">
-            <Icon name="chevronLeft" size={14} />
-            Previous
-          </button>
-          <button className="btn-ghost flex items-center gap-1">
-            Next
-            <Icon name="chevronRight" size={14} />
-          </button>
-        </div>
       </div>
       <p className="text-md text-ink-muted mb-6">Monday, 30 March 2026 · AI-optimised study plan</p>
 

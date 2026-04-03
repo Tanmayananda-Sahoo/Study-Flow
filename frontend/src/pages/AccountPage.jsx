@@ -44,7 +44,7 @@ function StatPill({ value, label }) {
   )
 }
 
-export default function AccountPage() {
+const AccountPage = () => {
   const [focused, setFocused] = useState(null)
   const [saved,   setSaved]   = useState(false)
 
@@ -277,7 +277,6 @@ export default function AccountPage() {
           <div className="flex flex-col divide-y divide-border-soft">
             {[
               { label: 'Email notifications',    sub: 'Receive study reminders via email' },
-              { label: 'Smart suggestions',      sub: 'Let AI suggest optimal study sessions' },
               { label: 'Weekly summary report',  sub: 'Get a summary every Monday morning' },
             ].map((pref, i) => (
               <div key={i} className="flex items-center justify-between py-3.5 first:pt-0 last:pb-0">
@@ -341,3 +340,5 @@ function ToggleSwitch({ defaultOn = false }) {
     </button>
   )
 }
+
+export default AccountPage;

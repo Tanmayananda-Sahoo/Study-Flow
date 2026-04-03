@@ -41,4 +41,8 @@ function detectFreeSlots(schedules) {
   return freeSlots;
 }
 
-export {convertToMinutes, sortSchedules, detectFreeSlots};
+module.exports = {
+  convertToMinutes,
+  sortSchedules, 
+  detectFreeSlots
+};

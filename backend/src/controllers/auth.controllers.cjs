@@ -9,16 +9,23 @@ const jwt = require('jsonwebtoken');
 
 const register = async(req,res) => {
     //Taking the input
-    const { name, email, password, confirmPassword, role, department } = req.body;
+    const { name, email, password, confirmPassword, department, academicYear, bio } = req.body;
 
     //Validation
-    if([name, password, email, confirmPassword, role, department].some((field) => field.trim() == '')) {
+    if([name, password, email, confirmPassword, department].some((field) => field.trim() == '')) {
         return res.status(401)
         .json({
             message: 'Fields cannot be empty. Every field is compulsory'
         })
     }
 
+    if(academicYear<0 || academicYear>4) {
+        return res.status(400)
+        .json({
+            message: 'Academic year has to be between 1 and 4'
+        })
+    }
+    
     if(password != confirmPassword) {
         return res.status(401)
         .json({
@@ -30,13 +37,6 @@ const register = async(req,res) => {
         return res.status(401)
         .json({
             message: "Please enter a valid email address"
-        })
-    }
-
-    if(role == 'admin') {
-        return res.status(401)
-        .json({
-            message: 'You cannot be admin sir.'
         })
     }
 
@@ -56,7 +56,6 @@ const register = async(req,res) => {
         name,
         email,
         password,
-        role,
         department
     })
     
@@ -163,10 +162,26 @@ const updateName = async(req,res) => {
     })
 }
 
+const updatePassword = async(req,res) => {
+    const {password} = req.body;
+    const userId = req.user._id;
+    const fetchedUser = await User.findByIdAndUpdate(userId, {password}, {new: true})
+    if(!fetchedUser) {
+        return res.status(401)
+        .json({
+            message: 'There is a problem with authenticating you. Please try logging in again.'
+        })
+    }
+    return res.status(200)
+    .json({
+        message: "Password updated successfully."
+    })
+}
 
 module.exports = {
     register,
     login,
     updateEmail,
-    updateName
+    updateName,
+    updatePassword
 }

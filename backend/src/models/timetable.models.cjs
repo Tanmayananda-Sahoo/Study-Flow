@@ -10,7 +10,8 @@ const timetableSchema = new mongoose.Schema(
 
     
     dayOfWeek: {
-      type: Number, // 0 = Sunday, 1 = Monday...
+      type: String,
+      enum: ['Mon', 'Tue', 'Wed', 'Thurs', 'Fri', 'Sat', 'Sun']
     },
 
     specificDate: {
@@ -36,6 +37,10 @@ const timetableSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    venue: {
+      type: String,
+      required: true
+    }
   },
   { timestamps: true }
 );
