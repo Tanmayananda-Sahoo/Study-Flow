@@ -26,6 +26,7 @@ function renderPage(page) {
 }
 
 export default function App() {
+  // 'login' | 'signup' | 'app'
   const [screen,     setScreen]     = useState('login')
   const [activePage, setActivePage] = useState('dashboard')
 

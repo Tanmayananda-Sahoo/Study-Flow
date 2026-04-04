@@ -15,7 +15,7 @@ const tagLabel = {
   low:  'Low',
 }
 
-const TaskCard = ({ task }) => {
+export default function TaskCard({ task }) {
   const { name, subject, priority, duration, due, done } = task
 
   return (
@@ -67,5 +67,3 @@ const TaskCard = ({ task }) => {
     </div>
   )
 }
-
-export default TaskCard;

@@ -31,7 +31,7 @@ const WEEK_BARS = [
   { day: 'Sun', h: 0   },
 ]
 
-const DashboardPage = () => {
+export default function DashboardPage() {
   return (
     <div>
       {/* Page header */}
@@ -152,5 +152,3 @@ const DashboardPage = () => {
     </div>
   )
 }
-
-export default DashboardPage;
