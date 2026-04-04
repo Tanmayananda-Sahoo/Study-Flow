@@ -28,6 +28,12 @@ const taskSchema = new mongoose.Schema({
     priorityStatus: {
         type: String,
         enum: ['High', 'Medium', 'Low']
+    },
+    startTime: {
+        type: Number
+    },
+    endTime: {
+        type: Number
     }
 })
 

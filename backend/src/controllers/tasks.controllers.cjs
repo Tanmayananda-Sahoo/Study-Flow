@@ -1,6 +1,6 @@
 const Task = require('../models/task.models.cjs');
 // const {convertToMinutes, sortSchedules, detectFreeSlots} = require('../utils/timeTable.cjs');
-const {calculatePriority} = require('../utils/task.cjs');
+const {calculatePriority, fetchTask} = require('../utils/task.cjs');
 
 const addTask = async(req,res) => {
     const tasks = req.body.tasks;
@@ -39,20 +39,48 @@ const addTask = async(req,res) => {
 }
 
 const fetchTodayTask = async(req,res) => {
-    if(!req.user._id) {
-        return res.status(400)
-        .json({
-            message: "User not authorized to fetch tasks."
-        })
-    }
-    const tasks = await Task.find({
-        userId: req.user._id
-    }).sort({deadline: 1})
-
-
+    const tasks = fetchTask();
+    
     return res.status(200)
     .json({
-        message: "All the tasks for today are fetched successfully."
+        message: "All the tasks for today are fetched successfully.",
+        tasks
     })
 }
 
+const updateTaskStatus = async(req,res) => {
+    const {id} = req.params;
+    const {completionStatus} = req.body;
+
+    if(!id) {
+        return res.status(400)
+        .json({
+            message: "Please select a task to update."
+        })
+    }
+
+    const task = await Task.findByIdAndUpdate(
+        id,
+        {completionStatus},
+        {new:true}
+    )
+
+    if(!task) {
+        return res.status(400)
+        .json({
+            message: "Task could not be updated."
+        })
+    }
+
+    return res.statu(200)
+    .json({
+        message: "Task updated successfully.",
+        task
+    })
+}
+
+module.exports = {
+    addTask,
+    fetchTodayTask,
+    updateTaskStatus
+}
