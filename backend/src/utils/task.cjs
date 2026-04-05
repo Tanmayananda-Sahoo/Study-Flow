@@ -1,4 +1,4 @@
-const Task = require('../models/task.models.cjs');
+const {Task} = require('../models/task.models.cjs');
 
 const calculatePriority = (deadline) => {
     const today = new Date();
@@ -12,25 +12,31 @@ const calculatePriority = (deadline) => {
     return "Low";
 }
 
-const fetchTask = async() => {
-    if(!req.user._id) {
+const fetchTask = async(id) => {
+    if(!id) {
         return res.status(400)
         .json({
             message: "User not authorized to fetch tasks."
         })
     }
     const tasks = await Task.find({
-        userId: req.user._id
+        userId: id
     }).sort({deadline: 1})
 
-    tasks.map(async(task) => {
+    console.log(tasks);
+
+    await Promise.all(tasks.map(async(task) => {
         const newPriority = calculatePriority(task.deadline);
         if(newPriority != task.priorityStatus) {
-            task.priorityStatus = newPriority;
-            await task.save();
+            await Task.findByIdAndUpdate(
+                task._id,
+                {priorityStatus: newPriority},
+                {new:true}
+            )
         }
-    })
-
+    }))
+    console.log(tasks);
+    return tasks;
 }
 module.exports = {
     calculatePriority,

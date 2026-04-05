@@ -1,6 +1,7 @@
 const express = require('express');
 const {authRouter} = require('./src/routes/auth.routes.cjs');
 const {timeTableRouter} = require('./src/routes/timeTable.routes.cjs');
+const {taskRouter} = require('./src/routes/task.routes.cjs');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
 

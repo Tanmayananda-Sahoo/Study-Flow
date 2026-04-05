@@ -6,7 +6,7 @@ const taskRouter = express.Router();
 
 taskRouter.post('/add', isUserAuthenticated, addTask);
 taskRouter.get('/fetch', isUserAuthenticated, fetchTodayTask);
-taskRouter.patch('/update/status', isUserAuthenticated, updateTaskStatus);
+taskRouter.patch('/update/status/{:id}', isUserAuthenticated, updateTaskStatus);
 module.exports = {
     taskRouter
 }
