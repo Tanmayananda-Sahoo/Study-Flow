@@ -10,7 +10,7 @@ const taskSchema = new mongoose.Schema({
         required: true
     },
     time: {
-        type: Number,
+        type: String,
         required: true
     },
     deadline: {
@@ -23,18 +23,22 @@ const taskSchema = new mongoose.Schema({
     },
     completionStatus: {
         type: String,
-        enum: ['Completed', 'Pending', '']
+        enum: ['Completed', 'Pending']
     },
     priorityStatus: {
         type: String,
         enum: ['High', 'Medium', 'Low']
     },
     startTime: {
-        type: Number
+        type: String
     },
     endTime: {
-        type: Number
+        type: String
     }
 })
 
-export default Task = new mongoose.model("Task", taskSchema);
+const Task = new mongoose.model("Task", taskSchema);
+
+module.exports = {
+    Task
+}

@@ -30,7 +30,7 @@ const userSchema = new mongoose.Schema({
     },
     academicYear: {
         type: Number,
-        required: true,
+        required: [true, "Academic Year is a required field."],
         enum: [1,2,3,4]
     }
 },{timestamps: true})
@@ -41,6 +41,8 @@ userSchema.pre('save', async function() {
     this.password = await bcrypt.hash(this.password, 10);
 })
 userSchema.methods.isPasswordCorrect = async function(password) {
+    console.log(password);
+    console.log(this.password);
     return await bcrypt.compare(password, this.password);
 }
 
@@ -58,4 +60,6 @@ userSchema.methods.generateToken = function() {
 
 const User = new mongoose.model('User', userSchema);
 
-module.exports = User;
+module.exports = {
+    User
+};

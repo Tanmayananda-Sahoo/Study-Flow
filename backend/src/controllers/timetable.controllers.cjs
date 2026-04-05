@@ -1,18 +1,15 @@
-const Timetable = require("../models/timetableModel.cjs");
-const fetchFreeSlots = require("../utils/timeTable.cjs");
-const fetchTask = require("../utils/task.cjs");
-//complete untested
-const addTimeTableEntry = async (req, res) => {
-  const { title, startTime, endTime, isRecurring, venue } = req.body;
+const {Timetable} = require("../models/timetable.models.cjs");
+const {fetchFreeSlots, getNextDateForDay} = require("../utils/timeTable.cjs");
+const {fetchTask} = require("../utils/task.cjs");
 
-  if (
-    [title, startTime, endTime, isRecurring, venue].some(
-      (field) => field.trim() == "",
-    )
-  ) {
-    return res.status(400).json({
-      message: "All the fields are required.",
-    });
+//complete and tested
+const addTimeTableEntry = async (req, res) => {
+  const { title, day, startTime, endTime, isRecurring, venue } = req.body;
+
+  if([title, startTime, endTime, venue].some((field) => field.trim() == "")) {
+      return res.status(400).json({
+        message: "All the fields are required.",
+      });
   }
 
   const userId = req.user._id;
@@ -20,16 +17,18 @@ const addTimeTableEntry = async (req, res) => {
     return res.status("User is unauthorized to add time table.");
   }
 
-  const today = new Date();
-  const todayDay = today.getDay();
+  const dateUpcoming = getNextDateForDay(day);
+
+  console.log(dateUpcoming)
 
   const timeTable = await Timetable.create({
     title,
     startTime,
     endTime,
     venue,
-    dayOfWeek: isRecurring ? todayDay : null,
-    specificDate: isRecurring ? null : today,
+    dayOfWeek: isRecurring ? day : null,
+    specificDate: isRecurring ? null : dateUpcoming,
+    userId: req.user._id
   });
 
   if (!timeTable) {
@@ -45,20 +44,23 @@ const addTimeTableEntry = async (req, res) => {
   });
 };
 
-//complete untested
+//complete and tested
 const getTimeTable = async (req, res) => {
   try {
     const today = new Date();
     const todayDay = today.getDay();
 
-    const startOfDay = new Date(today.setHours(0, 0, 0, 0));
-    const endOfDay = new Date(today.setHours(23, 59, 59, 999));
+    let startOfDay = new Date(today.setHours(0, 0, 0, 0));
+    let endOfDay = new Date(today.setHours(23, 59, 59, 999));
+
+    startOfDay = startOfDay.toLocaleDateString("en-GB");
+    endOfDay = endOfDay.toLocaleDateString("en-GB");
 
     const timeTable = await Timetable.find({
       userId: req.user._id,
       $or: [
-        { dayOfWeek: todayDay, isRecurring: true },
-        { specificDate: today, isRecurring: false },
+        { isRecurring: true },
+        { specificDate: {$gte: today}, isRecurring: false },
       ],
     }).sort({ startTime: 1 });
 
@@ -71,13 +73,17 @@ const getTimeTable = async (req, res) => {
   }
 };
 
+//complete and tested
 const getFreeSlots = async (req, res) => {
-  const freeSlots = fetchFreeSlots();
+  const id = req.user._id;
+  const freeSlots = await fetchFreeSlots(id);
+  // console.log(freeSlots);
   return res.status(200).json({
     message: "Free time slots fetched successfully.",
     freeSlots,
   });
 };
+
 
 const generateSchedule = async () => {
   const priorityMap = { HIGH: 3, MEDIUM: 2, LOW: 1 };

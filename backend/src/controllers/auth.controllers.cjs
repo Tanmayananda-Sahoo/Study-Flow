@@ -1,12 +1,6 @@
-const User = require('../models/user.models.cjs');
-const jwt = require('jsonwebtoken');
+const {User} = require('../models/user.models.cjs');
 
-/**
- * Register Controller.
- *
- * Will be used while registering the user.
- */
-
+//completed and tested.
 const register = async(req,res) => {
     //Taking the input
     const { name, email, password, confirmPassword, department, academicYear, bio } = req.body;
@@ -56,7 +50,9 @@ const register = async(req,res) => {
         name,
         email,
         password,
-        department
+        department,
+        academicYear,
+        bio
     })
     
     const token = await createdUser.generateToken();
@@ -76,12 +72,7 @@ const register = async(req,res) => {
     })
 }
 
-/**
- * 
- * Login Controller.
- * 
- * Will be used while logging in the user.
- */
+//completed and tested.
 const login = async(req,res) => {
     //Taking user input
     const {email, password} = req.body;
@@ -101,7 +92,7 @@ const login = async(req,res) => {
             message: 'Invalid credentials.'
         })
     }
-    const isPasswordValid = await existingUser.isPasswordCorrect(password)
+    const isPasswordValid = await existingUser.isPasswordCorrect(password);
     if(!isPasswordValid) {
         return res.status(401)
         .json({
@@ -125,6 +116,57 @@ const login = async(req,res) => {
     .json({
         message: 'User logged in successfully.',
         User: user
+    })
+}
+
+//completed and tested
+const updatePassword = async(req,res) => {
+    const {oldPassword, password, confirmPassword} = req.body;
+    const userId = req.user._id;
+
+    if(!userId) {
+        return res.status(400)
+        .json({
+            message:"User is not authenticated."
+        })
+    }
+    const existingUser = await User.findById(userId).select('+password');
+    if(!existingUser) {
+        return res.status(400)
+        .json({
+            message: "User does not exists."
+        })
+    }
+
+    const isPasswordValid = await existingUser.isPasswordCorrect(oldPassword);
+
+    if(!isPasswordValid) {
+        return res.status(400)
+        .json({
+            message: "Please enter the correct password."
+        })
+    }
+
+    if(password != confirmPassword) {
+        return res.statu(400)
+        .json({
+            message: "New password and confirm password should be same."
+        })
+    }
+    const fetchedUser = await User.findById(userId);
+    fetchedUser.password = password;
+    await fetchedUser.save();
+    if(!fetchedUser) {
+        return res.status(401)
+        .json({
+            message: 'There is a problem with authenticating you. Please try logging in again.'
+        })
+    }
+
+    return res.status(200)
+    .json({
+        message: "Password updated successfully.",
+        user: fetchedUser
     })
 }
 
@@ -162,26 +204,9 @@ const updateName = async(req,res) => {
     })
 }
 
-const updatePassword = async(req,res) => {
-    const {password} = req.body;
-    const userId = req.user._id;
-    const fetchedUser = await User.findByIdAndUpdate(userId, {password}, {new: true})
-    if(!fetchedUser) {
-        return res.status(401)
-        .json({
-            message: 'There is a problem with authenticating you. Please try logging in again.'
-        })
-    }
-    return res.status(200)
-    .json({
-        message: "Password updated successfully."
-    })
-}
 
 module.exports = {
     register,
     login,
-    updateEmail,
-    updateName,
     updatePassword
 }

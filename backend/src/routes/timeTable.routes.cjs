@@ -1,11 +1,14 @@
 const express = require('express');
-const {addTimeTableEntry, getTodaySchedule, getDefaultSchedule} = require('../controllers/timetable.controllers.cjs');
-const isUserAuthenticated = require('../middlewares/auth.middlewares.cjs');
+const {addTimeTableEntry, getTimeTable, getFreeSlots, generateSchedule} = require('../controllers/timetable.controllers.cjs');
+const {isUserAuthenticated} = require('../middlewares/auth.middlewares.cjs');
 
-const router = express.Router();
+const timeTableRouter = express.Router();
 
-router.route('/add').post(isUserAuthenticated, addTimeTableEntry);
-router.route('/get').get(isUserAuthenticated, getTodaySchedule);
-router.route('/get-default').get(isUserAuthenticated, getDefaultSchedule);
+timeTableRouter.route('/add').post(isUserAuthenticated, addTimeTableEntry);
+timeTableRouter.route('/get').get(isUserAuthenticated, getTimeTable);
+timeTableRouter.route('/get/freeslots').get(isUserAuthenticated, getFreeSlots);
+timeTableRouter.route('/get/schedule').get(isUserAuthenticated, generateSchedule);
 
-export default router;
+module.exports = {
+    timeTableRouter
+};

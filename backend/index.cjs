@@ -1,6 +1,6 @@
 const app = require('./app.cjs');
 const express = require('express');
-const connectDB = require('./src/db/index.db.cjs');
+const {connectDB} = require('./src/db/index.db.cjs');
 
 
 require('dotenv').config({

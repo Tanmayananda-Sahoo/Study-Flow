@@ -2,41 +2,64 @@ const Task = require('../models/task.models.cjs');
 // const {convertToMinutes, sortSchedules, detectFreeSlots} = require('../utils/timeTable.cjs');
 const {calculatePriority, fetchTask} = require('../utils/task.cjs');
 
-const addTask = async(req,res) => {
-    const tasks = req.body.tasks;
+const addTask = async (req, res) => {
+  try {
 
-    tasks.forEach(task => {
-        if([task.title, task.subject].some((field) => field.trim() == '') || task.time <= 0 || task.duration < 0) {
-            return res.status(400)
-            .json({
-                message: "Every field is required."
-            })
-        }
-    })
+    const { title, startTime, endTime, subject, deadline } = req.body;
 
-    const formattedTasks = tasks.map(task => {
-        priorityStatus = calculatePriority(task.deadline);
+    // Validation
+    if (
+      !title?.trim() ||
+      !startTime?.trim() ||
+      !endTime?.trim() ||
+      !subject?.trim() ||
+      !deadline ||
+      deadline <= 0
+    ) {
+      return res.status(400).json({
+        message: "All fields are required."
+      });
+    }
 
-        return {
-            user: req.user.id,
-            title: task.title,
-            subject: task.subject,
-            duration: task.duration,
-            deadline: task.deadline,
-            completionStatus: 'Pending',
-            priorityStatus
-        }
+    // Calculate duration
+    const start = new Date(`1970-01-01T${startTime}`);
+    const end = new Date(`1970-01-01T${endTime}`);
 
+    const duration = (end - start) / (1000 * 60); // minutes
+
+    if (duration <= 0) {
+      return res.status(400).json({
+        message: "End time must be greater than start time."
+      });
+    }
+
+    // Calculate priority
+    const priorityStatus = calculatePriority(deadline);
+
+    const newTask = await Task.create({
+      user: req.user.id,
+      title,
+      subject,
+      startTime,
+      endTime,
+      duration,
+      deadline,
+      completionStatus: "Pending",
+      priorityStatus
     });
 
-    const taskInserted = await Task.insertMany(formattedTasks);
+    return res.status(201).json({
+      message: "Task added successfully.",
+      task: newTask
+    });
 
-    return res.status(200)
-    .json({
-        message: "Task for today is saved successfully",
-        tasks: taskInserted
-    })
-}
+  } catch (error) {
+    return res.status(500).json({
+      message: "Error adding task",
+      error: error.message
+    });
+  }
+};
 
 const fetchTodayTask = async(req,res) => {
     const tasks = fetchTask();

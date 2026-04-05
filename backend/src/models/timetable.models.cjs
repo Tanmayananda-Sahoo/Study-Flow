@@ -11,7 +11,7 @@ const timetableSchema = new mongoose.Schema(
     
     dayOfWeek: {
       type: String,
-      enum: ['Mon', 'Tue', 'Wed', 'Thurs', 'Fri', 'Sat', 'Sun']
+      enum: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
     },
 
     specificDate: {
@@ -45,4 +45,8 @@ const timetableSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model("Timetable", timetableSchema);
+const Timetable = new mongoose.model("Timetable", timetableSchema);
+
+module.exports = {
+  Timetable
+}

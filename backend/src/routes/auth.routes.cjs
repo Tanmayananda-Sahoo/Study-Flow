@@ -1,12 +1,15 @@
 const express = require('express');
-const {login, register, updateEmail, updateName} = require('../controllers/auth.controllers.cjs');
-const isUserAuthenticated = require('../middlewares/auth.middlewares.cjs');
+const {login, register, updatePassword} = require('../controllers/auth.controllers.cjs');
+const {isUserAuthenticated} = require('../middlewares/auth.middlewares.cjs');
 
-const router = express.Router();
+const authRouter = express.Router();
 
-router.route('/login').post(login);
-router.route('/register').post(register);
-router.route('/update/email').post(isUserAuthenticated, updateEmail);
-router.route('/update/name').post(isUserAuthenticated, updateName);
+authRouter.route('/login').post(login);
+authRouter.route('/register').post(register);
+// authRouter.route('/update/email').patch(isUserAuthenticated, updateEmail);
+// authRouter.route('/update/name').patch(isUserAuthenticated, updateName);
+authRouter.route('/update/password').patch(isUserAuthenticated, updatePassword);
 
-module.exports = router;
+module.exports = {
+    authRouter
+};
