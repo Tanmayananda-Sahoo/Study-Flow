@@ -3,7 +3,7 @@ import userAxiosInstance from './userAxios.js';
 const register = async(userData) => {
     try {
         const response = await userAxiosInstance.post('/register', userData);
-        console.log(response);
+        console.log(response.data.user);
     } catch (error) {
         console.error(error);
     }
@@ -26,8 +26,19 @@ const updatePassword = async(userData) => {
         console.error(error);
     }
 }
+
+const fetchUser = async() => {
+    try {
+        const response = await userAxiosInstance.get('/fetch');
+        console.log('User response:', response);
+        return response;
+    } catch (error) {
+        console.error(error);
+    }
+}
 export {
     register,
     login,
-    updatePassword
+    updatePassword,
+    fetchUser
 }

@@ -1,8 +1,8 @@
-// src/pages/DashboardPage.jsx
-
-import DashboardCard from '../components/DashboardCard'
-import HoverCard     from '../components/HoverCard'
-import Icon          from '../components/Icon'
+import { getFreeSlots, getTodayTimeTable } from '../utils/timeTableFunctionality.js'
+import { useEffect, useState } from 'react'
+import DashboardCard from '../components/DashboardCard.jsx'
+import HoverCard     from '../components/HoverCard.jsx'
+import Icon          from '../components/Icon.jsx'
 
 const STATS = [
   { label: 'This Week', value: '18.5h',  sub: 'study hours' },
@@ -11,13 +11,15 @@ const STATS = [
   { label: 'Goal',      value: '84%',    sub: 'achieved'    },
 ]
 
-const CLASSES = [
-  { name: 'Advanced Mathematics', time: '9:00 – 10:30',  room: 'Hall A-204', status: 'upcoming' },
-  { name: 'Organic Chemistry',    time: '11:00 – 12:30', room: 'Lab B-108',  status: 'ongoing'  },
-  { name: 'English Literature',   time: '2:00 – 3:30',   room: 'Room C-301', status: 'upcoming' },
-]
+//Fetch from backend
+// const CLASSES = [
+//   { name: 'Advanced Mathematics', time: '9:00 – 10:30',  room: 'Hall A-204', status: 'upcoming' },
+//   { name: 'Organic Chemistry',    time: '11:00 – 12:30', room: 'Lab B-108',  status: 'ongoing'  },
+//   { name: 'English Literature',   time: '2:00 – 3:30',   room: 'Room C-301', status: 'upcoming' },
+// ]
 
-const FREE_SLOTS = ['10:30 – 11:00', '12:30 – 2:00', '3:30 – 5:00']
+//Fetched from backend
+// const FREE_SLOTS = ['10:30 – 11:00', '12:30 – 2:00', '3:30 – 5:00']
 
 const SUGGESTIONS = [
   { subject: 'Mathematics',      reason: 'Exam in 3 days',      duration: '90 min', icon: 'brain' },
@@ -32,6 +34,24 @@ const WEEK_BARS = [
 ]
 
 export default function DashboardPage() {
+  const [freeSlots, setFreeSlots] = useState([]);
+  const [classes, setClasses] = useState([]);
+  useEffect(() => {
+    async function loadData(){
+      console.log("Running use effect.");
+      const [freeSlotsData, classesData] = await Promise.all([
+        getFreeSlots(),
+        getTodayTimeTable()
+      ]);
+      setFreeSlots(freeSlotsData.data.freeSlots);
+      setClasses(classesData.data.TimeTable);
+      console.log("Use effect free slots: ",freeSlotsData);
+      console.log("Use effect classes:", classesData);
+    }
+
+    loadData();
+  },[])
+
   return (
     <div>
       {/* Page header */}
@@ -53,9 +73,10 @@ export default function DashboardPage() {
         <HoverCard>
           <p className="card-label">Today's Classes</p>
           <div className="flex flex-col gap-3">
-            {CLASSES.map(c => (
+            {classes.length == 0 ? <p>No classes found for today.</p>:
+              classes.map((c) => (
               <div
-                key={c.name}
+                key={c._id}
                 className="flex items-center gap-3 p-3 bg-paper rounded-xl border border-border-soft"
               >
                 <div
@@ -74,8 +95,8 @@ export default function DashboardPage() {
                   />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-md font-medium text-ink">{c.name}</p>
-                  <p className="text-xs text-ink-muted mt-0.5">{c.time} · {c.room}</p>
+                  <p className="text-md font-medium text-ink">{c.title}</p>
+                  <p className="text-xs text-ink-muted mt-0.5">{c.startTime} - {c.endTime} · {c.venue}</p>
                 </div>
                 {c.status === 'ongoing' && <span className="badge-live shrink-0">Live</span>}
               </div>
@@ -87,14 +108,15 @@ export default function DashboardPage() {
         <HoverCard>
           <p className="card-label">Free Time Slots</p>
           <div className="flex flex-col gap-2">
-            {FREE_SLOTS.map(slot => (
+            {freeSlots.length == 0 ? <p>No free slots found for the day.</p>:
+            freeSlots.map(slot => (
               <div
                 key={slot}
                 className="flex items-center justify-between px-4 py-3 bg-accent-light rounded-xl border border-accent-mid"
               >
                 <div className="flex items-center gap-2">
                   <Icon name="clock" size={14} className="text-accent" />
-                  <span className="text-base font-medium text-accent">{slot}</span>
+                  <span className="text-base font-medium text-accent">{slot.start}-{slot.end}</span>
                 </div>
                 <button className="text-xs font-medium text-accent border border-accent-mid bg-white rounded-full px-3 py-1 hover:bg-accent-light transition-colors">
                   Schedule

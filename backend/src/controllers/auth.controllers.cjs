@@ -148,7 +148,7 @@ const updatePassword = async(req,res) => {
     }
 
     if(password != confirmPassword) {
-        return res.statu(400)
+        return res.status(400)
         .json({
             message: "New password and confirm password should be same."
         })
@@ -167,6 +167,30 @@ const updatePassword = async(req,res) => {
     .json({
         message: "Password updated successfully.",
         user: fetchedUser
+    })
+}
+
+const fetchUser = async(req,res) => {
+    const id = req.user._id;
+
+    if(!id) {
+        return res.status(400)
+        .json({
+            message: "User not authenticated. Please Login again."
+        })
+    }
+    const user = await User.findById(id);
+    if(!user) {
+        return res.status(400)
+        .json({
+            message: "User not found. Please register."
+        })
+    }
+
+    return res.status(200)
+    .json({
+        message: "User fetched successfully.",
+        user
     })
 }
 
@@ -208,5 +232,6 @@ const updateName = async(req,res) => {
 module.exports = {
     register,
     login,
-    updatePassword
+    updatePassword,
+    fetchUser
 }

@@ -1,6 +1,8 @@
 // src/components/TimetableGrid.jsx
 // 5-day timetable grid. Accepts a `classes` array as prop for dynamic entries.
 
+import Icon from './Icon'
+
 const DAYS  = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
 const HOURS = ['8:00','9:00','10:00','11:00','12:00','1:00','2:00','3:00','4:00','5:00','6:00']
 
@@ -29,7 +31,7 @@ function spanFromTimes(start, end) {
   return Math.max(1, Math.round(e - s))
 }
 
-export default function TimetableGrid({ classes = [] }) {
+export default function TimetableGrid({ classes = [], onDelete }) {
   return (
     <div className="bg-white border border-border rounded-3xl overflow-hidden">
 
@@ -71,6 +73,14 @@ export default function TimetableGrid({ classes = [] }) {
                     className={`${col.bg} border ${col.border} rounded-lg px-2.5 py-2 overflow-hidden`}
                     style={{ height: `${span * 64 - 10}px` }}
                   >
+                    {onDelete && (
+                      <button
+                        onClick={() => onDelete(cls)}
+                        className="absolute top-1 right-1 w-6 h-6 rounded-md bg-red-50 border border-red-200 flex items-center justify-center text-red-600 hover:bg-red-100 transition-colors duration-150"
+                      >
+                        <Icon name="trash" size={12} />
+                      </button>
+                    )}
                     <p className={`text-xs font-semibold ${col.text} leading-tight`}>{cls.name}</p>
                     <p className={`text-2xs mt-0.5 ${col.text} opacity-70`}>{cls.venue}</p>
                     <p className={`text-2xs mt-0.5 ${col.text} opacity-55`}>{cls.start} – {cls.end}</p>

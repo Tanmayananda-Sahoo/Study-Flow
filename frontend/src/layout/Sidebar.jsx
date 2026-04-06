@@ -4,11 +4,10 @@ import Icon from '../components/Icon'
 
 const SIDEBAR_ITEMS = [
   { id: 'dashboard',     label: 'Dashboard',      icon: 'dashboard' },
-  { id: 'timetable',     label: 'Timetable',       icon: 'timetable' },
-  { id: 'tasks',         label: 'Study Tasks',     icon: 'tasks'     },
-  { id: 'schedule',      label: 'Smart Schedule',  icon: 'schedule'  },
-  { id: 'notifications', label: 'Notifications',   icon: 'bell'      },
-  { id: 'account',       label: 'Account',         icon: 'user'      },
+  { id: 'timetable',     label: 'Timetable',      icon: 'timetable' },
+  { id: 'tasks',         label: 'Study Tasks',    icon: 'tasks'     },
+  { id: 'schedule',      label: 'Smart Schedule', icon: 'schedule'  },
+  { id: 'account',       label: 'Account',        icon: 'user'      },
 ]
 
 export default function Sidebar({ activePage, setActivePage }) {

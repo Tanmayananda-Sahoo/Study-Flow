@@ -11,7 +11,7 @@ const addTimeTable = async(timeTableData) => {
 const getTimeTable = async() => {
     try {
         const response = await timeTableAxiosInstance.get('/get');
-        console.log(response);
+        console.log("Time Table: ", response);
     } catch (error) {
         console.error(error);
     }
@@ -19,7 +19,17 @@ const getTimeTable = async() => {
 const getFreeSlots = async() => {
     try {
         const response = await timeTableAxiosInstance.get('/get/freeslots');
-        console.log(response);
+        console.log("Today's free slots:", response);
+        return response;
+    } catch (error) {
+        console.error(error);
+    }
+}
+const getTodayTimeTable = async() => {
+    try {
+        const response = await timeTableAxiosInstance.get('/get/todaytimetable');
+        console.log("Today Time table: ", response);
+        return response;
     } catch (error) {
         console.error(error);
     }
@@ -28,5 +38,6 @@ const getFreeSlots = async() => {
 export {
     addTimeTable,
     getTimeTable,
-    getFreeSlots
+    getFreeSlots,
+    getTodayTimeTable
 }

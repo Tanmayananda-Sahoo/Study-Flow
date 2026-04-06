@@ -168,7 +168,7 @@ export default function TimetablePage() {
     }
 
     const color = COLOR_CYCLE[classes.length % COLOR_CYCLE.length];
-    const newClass = {
+    const userData = {
       id: Date.now(),
       day: day,
       start: startTime,
@@ -190,6 +190,10 @@ export default function TimetablePage() {
   };
 
   const repeatCount = classes.filter((c) => c.repeats).length;
+
+  const handleDelete = (cls) => {
+    setClasses((prev) => prev.filter((c) => c.id !== cls.id));
+  };
 
   return (
     <>
@@ -443,7 +447,7 @@ export default function TimetablePage() {
         </div>
 
         {/* Grid */}
-        <TimetableGrid classes={classes} />
+        <TimetableGrid classes={classes} onDelete={handleDelete} />
       </div>
     </>
   );

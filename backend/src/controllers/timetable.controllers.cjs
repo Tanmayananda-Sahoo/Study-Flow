@@ -1,5 +1,5 @@
 const {Timetable} = require("../models/timetable.models.cjs");
-const {fetchFreeSlots, getNextDateForDay} = require("../utils/timeTable.cjs");
+const {fetchFreeSlots, getNextDateForDay, formatDay} = require("../utils/timeTable.cjs");
 const {fetchTask} = require("../utils/task.cjs");
 
 //complete and tested
@@ -73,6 +73,35 @@ const getTimeTable = async (req, res) => {
   }
 };
 
+const getTodayTimeTable = async (req, res) => {
+  try {
+    let today = new Date();
+    const todayDay = today.getDay();
+
+    let startOfDay = new Date(today.setHours(0, 0, 0, 0));
+    let endOfDay = new Date(today.setHours(23, 59, 59, 999));
+
+    const todayDate = today.toLocaleDateString("en-GB");
+    startOfDay = startOfDay.toLocaleDateString("en-GB");
+    endOfDay = endOfDay.toLocaleDateString("en-GB");
+
+    const timeTable = await Timetable.find({
+      userId: req.user._id,
+      $or: [
+        { isRecurring: true, dayOfWeek: formatDay(today.getDay())},
+        { specificDate: todayDate, isRecurring: false },
+      ],
+    }).sort({ startTime: 1 });
+
+    return res.status(200).json({
+      message: "Default time table fetched successfully.",
+      TimeTable: timeTable,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 //complete and tested
 const getFreeSlots = async (req, res) => {
   const id = req.user._id;
@@ -123,5 +152,6 @@ module.exports = {
   addTimeTableEntry,
   getTimeTable,
   getFreeSlots,
-  generateSchedule
+  generateSchedule,
+  getTodayTimeTable
 };

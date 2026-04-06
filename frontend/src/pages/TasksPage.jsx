@@ -1,8 +1,7 @@
-// src/pages/TasksPage.jsx
-
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import TaskCard from '../components/TaskCard'
 import Icon from '../components/Icon'
+import { fetchTask, addTasks } from '../utils/taskFunctionality.js'
 
 const INITIAL_TASKS = [
   { id: 1, name: 'Calculus Problem Set 4',        subject: 'Mathematics',        priority: 'high', duration: '90 min',  due: 'Tomorrow',   done: false },
@@ -21,18 +20,29 @@ const FILTERS = [
   { id: 'done',    label: 'Completed'     },
 ]
 
-const PRIORITIES = ['high', 'med', 'low']
-
-const EMPTY_FORM = { title: '', start: '', end: '', subject: '', deadline: '' }
+const EMPTY_FORM = { title: '', duration: '', subject: '', deadline: '' }
 
 export default function TasksPage() {
+
   const [tasks,     setTasks]     = useState(INITIAL_TASKS)
   const [filter,    setFilter]    = useState('all')
   const [showModal, setShowModal] = useState(false)
   const [form,      setForm]      = useState(EMPTY_FORM)
-  const [priority,  setPriority]  = useState('med')
   const [errors,    setErrors]    = useState({})
   const [focused,   setFocused]   = useState(null)
+  const [title, setTitle] = useState("");
+  const [duration, setDuration] = useState("");
+  const [deadline, setDeadline] = useState(0);
+  const [subject, setSubject] = useState("");
+  const [completionStatus, setCompletionStatus] = useState("pending")
+  useEffect(() => {
+    async function loadData() {
+      const taskRes = await fetchTask();
+      console.log("Use effect taskres:", taskRes);
+      setTasks(taskRes.data.tasks);
+    }
+    loadData();
+  },[])
 
   const set = (field) => (e) => setForm(prev => ({ ...prev, [field]: e.target.value }))
 
@@ -44,43 +54,47 @@ export default function TasksPage() {
 
   const validate = () => {
     const e = {}
-    if (!form.title.trim())   e.title   = 'Title is required'
-    if (!form.start.trim())   e.start   = 'Start time required'
-    if (!form.end.trim())     e.end     = 'End time required'
-    if (!form.subject.trim()) e.subject = 'Subject is required'
-    if (!form.deadline || isNaN(Number(form.deadline)) || Number(form.deadline) <= 0)
+    if (!title.trim())   e.title   = 'Title is required'
+    if (!duration.trim()) e.duration = 'Duration is required'
+    if (!subject.trim()) e.subject = 'Subject is required'
+    if (!deadline || isNaN(Number(deadline)) || Number(deadline) <= 0)
       e.deadline = 'Enter a positive number'
     return e
   }
 
-  const handleAdd = () => {
+  const handleAdd = async() => {
     const e = validate()
     if (Object.keys(e).length) { setErrors(e); return }
 
     const newTask = {
-      id:       Date.now(),
-      name:     form.title,
-      subject:  form.subject,
-      priority,
-      duration: `${form.start} – ${form.end}`,
-      due:      `${form.deadline}h deadline`,
-      done:     false,
+      title: title,
+      subject: subject,
+      time: duration,
+      deadline: deadline,
+      completionStatus: 'pending',
     }
+
     setTasks(prev => [newTask, ...prev])
     setForm(EMPTY_FORM)
-    setPriority('med')
     setErrors({})
     setShowModal(false)
+
+    const response = await addTasks(newTask);
+    console.log("Use effect task add:", response);
+    // setTitle(response.data.task.title);
   }
 
   const closeModal = () => { setShowModal(false); setErrors({}) }
 
-  const filtered = tasks.filter(t => {
-    if (filter === 'pending') return !t.done
-    if (filter === 'done')    return  t.done
-    if (filter === 'high')    return  t.priority === 'high' && !t.done
-    return true
-  })
+  const handleDelete = (id) => {
+    setTasks(prev => prev.filter(t => t.id !== id))
+  }
+
+  const filtered = tasks.filter(task => {
+    if (filter === "pending") return task.completionStatus === "pending";
+    if (filter === "completed") return task.completionStatus === "completed";
+    return true;
+  });
 
   const pendingCount   = tasks.filter(t => !t.done).length
   const completedCount = tasks.filter(t =>  t.done).length
@@ -125,8 +139,8 @@ export default function TasksPage() {
                 <input
                   type="text"
                   placeholder="e.g. Calculus Problem Set 5"
-                  value={form.title}
-                  onChange={set('title')}
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
                   onFocus={() => setFocused('title')}
                   onBlur={() => setFocused(null)}
                   className={inputCls('title')}
@@ -134,32 +148,19 @@ export default function TasksPage() {
                 {errors.title && <p className="text-xs text-red-500 mt-1">{errors.title}</p>}
               </div>
 
-              {/* Start + End side by side */}
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-medium text-ink-muted mb-1.5 tracking-label">Start time</label>
-                  <input
-                    type="time"
-                    value={form.start}
-                    onChange={set('start')}
-                    onFocus={() => setFocused('start')}
-                    onBlur={() => setFocused(null)}
-                    className={inputCls('start')}
-                  />
-                  {errors.start && <p className="text-xs text-red-500 mt-1">{errors.start}</p>}
-                </div>
-                <div>
-                  <label className="block text-xs font-medium text-ink-muted mb-1.5 tracking-label">End time</label>
-                  <input
-                    type="time"
-                    value={form.end}
-                    onChange={set('end')}
-                    onFocus={() => setFocused('end')}
-                    onBlur={() => setFocused(null)}
-                    className={inputCls('end')}
-                  />
-                  {errors.end && <p className="text-xs text-red-500 mt-1">{errors.end}</p>}
-                </div>
+              {/* Duration */}
+              <div>
+                <label className="block text-xs font-medium text-ink-muted mb-1.5 tracking-label">Duration</label>
+                <input
+                  type="text"
+                  placeholder="e.g. 90 minutes"
+                  value={duration}
+                  onChange={(e) => setDuration(e.target.value)}
+                  onFocus={() => setFocused('duration')}
+                  onBlur={() => setFocused(null)}
+                  className={inputCls('duration')}
+                />
+                {errors.duration && <p className="text-xs text-red-500 mt-1">{errors.duration}</p>}
               </div>
 
               {/* Subject */}
@@ -168,8 +169,8 @@ export default function TasksPage() {
                 <input
                   type="text"
                   placeholder="e.g. Mathematics"
-                  value={form.subject}
-                  onChange={set('subject')}
+                  value={subject}
+                  onChange={(e) => setSubject(e.target.value)}
                   onFocus={() => setFocused('subject')}
                   onBlur={() => setFocused(null)}
                   className={inputCls('subject')}
@@ -184,8 +185,8 @@ export default function TasksPage() {
                   type="number"
                   min="1"
                   placeholder="e.g. 48  (hours from now)"
-                  value={form.deadline}
-                  onChange={set('deadline')}
+                  value={deadline}
+                  onChange={(e) => setDeadline(e.target.value)}
                   onFocus={() => setFocused('deadline')}
                   onBlur={() => setFocused(null)}
                   className={inputCls('deadline')}
@@ -196,31 +197,6 @@ export default function TasksPage() {
                 }
               </div>
 
-              {/* Priority selector */}
-              <div>
-                <label className="block text-xs font-medium text-ink-muted mb-2 tracking-label">Priority</label>
-                <div className="flex gap-2">
-                  {PRIORITIES.map(p => (
-                    <button
-                      key={p}
-                      onClick={() => setPriority(p)}
-                      className={`
-                        flex-1 py-2 rounded-lg text-xs font-medium border
-                        transition-all duration-150 cursor-pointer capitalize
-                        ${priority === p
-                          ? p === 'high'
-                            ? 'bg-orange-50 border-orange-200 text-orange-700'
-                            : p === 'med'
-                            ? 'bg-accent-light border-accent-mid text-accent'
-                            : 'bg-green-50 border-green-200 text-green-700'
-                          : 'bg-paper border-border text-ink-muted hover:border-accent-mid'}
-                      `}
-                    >
-                      {p === 'med' ? 'Medium' : p === 'high' ? 'High' : 'Low'}
-                    </button>
-                  ))}
-                </div>
-              </div>
             </div>
 
             {/* Modal footer */}
@@ -275,7 +251,7 @@ export default function TasksPage() {
               No tasks match this filter.
             </div>
           ) : (
-            filtered.map(task => <TaskCard key={task.id} task={task} />)
+            filtered.map(task => <TaskCard key={task._id} task={task} onDelete={handleDelete} />)
           )}
         </div>
       </div>

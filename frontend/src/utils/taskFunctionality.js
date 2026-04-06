@@ -3,7 +3,8 @@ import taskAxiosInstance from './taskAxios.js'
 const addTasks = async(taskData) => {
     try {
         const response = await taskAxiosInstance.post('/add', taskData);
-        console.log(response);
+        console.log("added task response:", response);
+        return response;
     } catch (error) {
         console.error(error);
     }
@@ -11,7 +12,8 @@ const addTasks = async(taskData) => {
 const fetchTask = async() => {
     try {
         const response = await taskAxiosInstance.get('/fetch');
-        console.log(response);
+        console.log("Today's task:",response);
+        return response;
     } catch (error) {
         console.error(error);
     }

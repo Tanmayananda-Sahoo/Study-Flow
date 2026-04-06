@@ -2,11 +2,22 @@
 
 import { useState } from 'react'
 import Icon from '../components/Icon'
+import { login } from '../utils/userFunctionality.js'
 
 export default function LoginPage({ onLogin, onGoSignup }) {
   const [email,    setEmail]    = useState('')
   const [password, setPassword] = useState('')
   const [focused,  setFocused]  = useState(null)
+
+  const handleSubmit = async() => {
+    const userData = {
+      email,
+      password
+    }
+
+    await login(userData);
+    onLogin();
+  }
 
   const inputCls = (field) =>
     `w-full px-3.5 py-2.5 rounded-lg text-md text-ink bg-white font-sans
@@ -69,7 +80,7 @@ export default function LoginPage({ onLogin, onGoSignup }) {
           </div>
 
           <button
-            onClick={onLogin}
+            onClick={handleSubmit}
             className="btn-primary w-full text-center py-2.5 mt-1"
           >
             Sign in

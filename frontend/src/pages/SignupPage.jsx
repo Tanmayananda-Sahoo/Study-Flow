@@ -1,9 +1,8 @@
-// src/pages/SignupPage.jsx
-
 import { useState } from 'react'
 import Icon from '../components/Icon'
+import {register, login, updatePassword} from '../utils/userFunctionality.js';
 
-const ROLES = ['Student', 'Teaching Assistant', 'Lecturer', 'Researcher']
+const ACADEMIC_YEARS = ['1', '2', '3', '4']
 
 const DEPARTMENTS = [
   'Computer Science',
@@ -19,14 +18,20 @@ const DEPARTMENTS = [
 ]
 
 export default function SignupPage({ onSignup, onGoLogin }) {
+  const [name,setName] = useState("");
+  const [email,setEmail] = useState("");
+  const [department,setDepartment] = useState("");
+  const [password,setPassword] = useState("");
+  const [confirmPassword,setConfirmPassword] = useState("");
+  const [academicYear, setAcademicYear] = useState(null);
   const [focused, setFocused] = useState(null)
   const [form, setForm] = useState({
-    name:            '',
-    email:           '',
-    password:        '',
+    name: '',
+    email: '',
+    password: '',
     confirmPassword: '',
-    role:            '',
-    department:      '',
+    department: '',
+    academicYear: ''
   })
   const [errors, setErrors] = useState({})
 
@@ -36,21 +41,32 @@ export default function SignupPage({ onSignup, onGoLogin }) {
   // Very light client-side validation
   const validate = () => {
     const errs = {}
-    if (!form.name.trim())            errs.name            = 'Full name is required'
-    if (!form.email.includes('@'))    errs.email           = 'Enter a valid email'
-    if (form.password.length < 8)     errs.password        = 'At least 8 characters'
-    if (form.password !== form.confirmPassword)
-                                      errs.confirmPassword = 'Passwords do not match'
-    if (!form.role)                   errs.role            = 'Select a role'
-    if (!form.department)             errs.department      = 'Select a department'
+    if (!name.trim()) errs.name = 'Full name is required'
+    if (!email.includes('@')) errs.email = 'Enter a valid email'
+    if (password.length < 8) errs.password = 'At least 8 characters'
+    if (password !== confirmPassword) errs.confirmPassword = 'Passwords do not match'
+    if (!department) errs.department = 'Select a department'
+    if (!academicYear) errs.academicYear = 'Select academic year'
+    
     return errs
   }
 
-  const handleSubmit = () => {
+  const handleSubmit = async() => {
     const errs = validate()
     if (Object.keys(errs).length) { setErrors(errs); return }
     setErrors({})
     onSignup(form)
+    const userData = {
+        name,
+        email,
+        password,
+        confirmPassword,
+        department,
+        academicYear: Number(academicYear)
+    }
+    console.log("user data:", userData)
+    await register(userData);
+  
   }
 
   // Shared input class builder
@@ -101,8 +117,8 @@ export default function SignupPage({ onSignup, onGoLogin }) {
             <input
               type="text"
               placeholder="Alex Chen"
-              value={form.name}
-              onChange={set('name')}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
               onFocus={() => setFocused('name')}
               onBlur={() => setFocused(null)}
               className={inputCls('name')}
@@ -118,8 +134,8 @@ export default function SignupPage({ onSignup, onGoLogin }) {
             <input
               type="email"
               placeholder="you@university.edu"
-              value={form.email}
-              onChange={set('email')}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               onFocus={() => setFocused('email')}
               onBlur={() => setFocused(null)}
               className={inputCls('email')}
@@ -136,8 +152,8 @@ export default function SignupPage({ onSignup, onGoLogin }) {
               <input
                 type="password"
                 placeholder="Min. 8 chars"
-                value={form.password}
-                onChange={set('password')}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 onFocus={() => setFocused('password')}
                 onBlur={() => setFocused(null)}
                 className={inputCls('password')}
@@ -151,8 +167,8 @@ export default function SignupPage({ onSignup, onGoLogin }) {
               <input
                 type="password"
                 placeholder="Repeat password"
-                value={form.confirmPassword}
-                onChange={set('confirmPassword')}
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
                 onFocus={() => setFocused('confirmPassword')}
                 onBlur={() => setFocused(null)}
                 className={inputCls('confirmPassword')}
@@ -161,33 +177,33 @@ export default function SignupPage({ onSignup, onGoLogin }) {
             </div>
           </div>
 
-          {/* Role + Department — side by side */}
+          {/* Academic Year + Department — side by side */}
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-medium text-ink-muted mb-1.5 tracking-label">
-                Role
+                Academic Year
               </label>
               <select
-                value={form.role}
-                onChange={set('role')}
-                onFocus={() => setFocused('role')}
+                value={academicYear}
+                onChange={(e) => setAcademicYear(e.target.value)}
+                onFocus={() => setFocused('academicYear')}
                 onBlur={() => setFocused(null)}
-                className={selectCls('role')}
+                className={selectCls('academicYear')}
               >
-                <option value="" disabled>Select role</option>
-                {ROLES.map(r => (
-                  <option key={r} value={r}>{r}</option>
+                <option value="" disabled>Select year</option>
+                {ACADEMIC_YEARS.map(y => (
+                  <option key={y} value={y}>{y}</option>
                 ))}
               </select>
-              <FieldError field="role" />
+              <FieldError field="academicYear" />
             </div>
             <div>
               <label className="block text-xs font-medium text-ink-muted mb-1.5 tracking-label">
                 Department
               </label>
               <select
-                value={form.department}
-                onChange={set('department')}
+                value={department}
+                onChange={(e) => setDepartment(e.target.value)}
                 onFocus={() => setFocused('department')}
                 onBlur={() => setFocused(null)}
                 className={selectCls('department')}

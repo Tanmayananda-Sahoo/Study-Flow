@@ -1,8 +1,6 @@
-// src/pages/AccountPage.jsx
-
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Icon from '../components/Icon'
-
+import { fetchUser } from '../utils/userFunctionality.js'
 // Reusable labelled field row
 function Field({ label, children }) {
   return (
@@ -28,7 +26,7 @@ function Section({ title, description, children }) {
   )
 }
 
-const ROLES       = ['Student', 'Teaching Assistant', 'Lecturer', 'Researcher']
+const ACADEMIC_YEARS = ['1', '2', '3', '4']
 const DEPARTMENTS = [
   'Computer Science', 'Mathematics', 'Physics', 'Chemistry',
   'Biology', 'Engineering', 'English & Literature', 'Economics', 'Psychology', 'Other',
@@ -47,15 +45,17 @@ function StatPill({ value, label }) {
 export default function AccountPage() {
   const [focused, setFocused] = useState(null)
   const [saved,   setSaved]   = useState(false)
-
-  const [profile, setProfile] = useState({
-    name:       'Alex Chen',
-    email:      'alex.chen@university.edu',
-    role:       'Student',
-    department: 'Computer Science',
-    bio:        'Year 3 CS student passionate about algorithms and machine learning.',
-    year:       'Year 3',
-  })
+  const [profile, setProfile] = useState({})
+  useEffect(() => {
+    async function loadData() {
+      const userRes = await fetchUser();
+      console.log('Use effect user: ', userRes);
+      setProfile(userRes.data.user);
+      console.log(profile);
+    }
+    loadData();
+  },[])
+  
 
   const [passwords, setPasswords] = useState({
     current:  '',
@@ -83,12 +83,9 @@ export default function AccountPage() {
      ${focused === field ? 'border-accent' : 'border-border'}
      ${profile[field] ? 'text-ink' : 'text-ink-muted'}`
 
-  const initials = profile.name
-    .split(' ')
-    .map(w => w[0])
-    .join('')
-    .slice(0, 2)
-    .toUpperCase()
+  const yearLabel = profile.academicYear ? `Year ${profile.academicYear}` : ''
+
+  const initials = 'SF';
 
   return (
     <div>
@@ -102,7 +99,7 @@ export default function AccountPage() {
         <div className="bg-white border border-border rounded-2xl px-6 py-6">
           <div className="flex items-center gap-5">
             {/* Avatar */}
-            <div className="w-16 h-16 rounded-2xl bg-accent-light flex items-center justify-center text-2xl font-semibold text-accent shrink-0">
+            <div className="w-16 h-16 rounded-2xl bg-accent-light flex items-center justify-center text-md font-semibold text-accent shrink-0">
               {initials}
             </div>
 
@@ -110,7 +107,7 @@ export default function AccountPage() {
             <div className="flex-1 min-w-0">
               <h2 className="text-xl font-semibold text-ink tracking-tight">{profile.name}</h2>
               <p className="text-xs text-ink-muted mt-0.5">
-                {profile.role} · {profile.department}
+                Year {profile.academicYear} · {profile.department}
               </p>
               <p className="text-xs text-ink-muted mt-0.5">{profile.email}</p>
             </div>
@@ -132,11 +129,11 @@ export default function AccountPage() {
         </div>
 
         {/* ── Personal information ─────────────────────────────── */}
-        <Section title="Personal Information" description="Update your name, email and bio.">
-          <div className="flex flex-col gap-4">
+        {/* <Section title="Personal Information" description="Update your name, email and bio.">
+          <div className="flex flex-col gap-4"> */}
 
             {/* Name + Email side by side */}
-            <div className="grid grid-cols-2 gap-3">
+            {/* <div className="grid grid-cols-2 gap-3">
               <Field label="Full name">
                 <input
                   type="text"
@@ -146,8 +143,8 @@ export default function AccountPage() {
                   onBlur={() => setFocused(null)}
                   className={inputCls('name')}
                 />
-              </Field>
-              <Field label="Email address">
+              </Field> */}
+              {/* <Field label="Email address">
                 <input
                   type="email"
                   value={profile.email}
@@ -156,20 +153,20 @@ export default function AccountPage() {
                   onBlur={() => setFocused(null)}
                   className={inputCls('email')}
                 />
-              </Field>
+              </Field> */}
             </div>
 
-            {/* Role + Department */}
-            <div className="grid grid-cols-2 gap-3">
-              <Field label="Role">
+            {/* Academic Year + Department */}
+            {/* <div className="grid grid-cols-2 gap-3">
+              <Field label="Academic Year">
                 <select
-                  value={profile.role}
-                  onChange={setP('role')}
-                  onFocus={() => setFocused('role')}
+                  value={profile.academicYear}
+                  onChange={setP('academicYear')}
+                  onFocus={() => setFocused('academicYear')}
                   onBlur={() => setFocused(null)}
-                  className={selectCls('role')}
+                  className={selectCls('academicYear')}
                 >
-                  {ROLES.map(r => <option key={r} value={r}>{r}</option>)}
+                  {ACADEMIC_YEARS.map(y => <option key={y} value={y}>{y}</option>)}
                 </select>
               </Field>
               <Field label="Department">
@@ -183,23 +180,10 @@ export default function AccountPage() {
                   {DEPARTMENTS.map(d => <option key={d} value={d}>{d}</option>)}
                 </select>
               </Field>
-            </div>
-
-            {/* Year */}
-            <Field label="Academic year">
-              <input
-                type="text"
-                value={profile.year}
-                onChange={setP('year')}
-                onFocus={() => setFocused('year')}
-                onBlur={() => setFocused(null)}
-                placeholder="e.g. Year 3"
-                className={inputCls('year')}
-              />
-            </Field>
+            </div> */}
 
             {/* Bio */}
-            <Field label="Short bio">
+            {/* <Field label="Short bio">
               <textarea
                 rows={3}
                 value={profile.bio}
@@ -209,10 +193,10 @@ export default function AccountPage() {
                 placeholder="Tell us a little about yourself..."
                 className={`${inputCls('bio')} resize-none leading-relaxed`}
               />
-            </Field>
+            </Field> */}
 
             {/* Save row */}
-            <div className="flex items-center gap-3 pt-1">
+            {/* <div className="flex items-center gap-3 pt-1">
               <button onClick={handleSave} className="btn-primary px-6">
                 Save changes
               </button>
@@ -224,7 +208,7 @@ export default function AccountPage() {
               )}
             </div>
           </div>
-        </Section>
+        </Section> */}
 
         {/* ── Change password ───────────────────────────────────── */}
         <Section title="Change Password" description="Use a strong password you don't use elsewhere.">
@@ -278,7 +262,6 @@ export default function AccountPage() {
             {[
               { label: 'Email notifications',    sub: 'Receive study reminders via email' },
               { label: 'Smart suggestions',      sub: 'Let AI suggest optimal study sessions' },
-              { label: 'Weekly summary report',  sub: 'Get a summary every Monday morning' },
             ].map((pref, i) => (
               <div key={i} className="flex items-center justify-between py-3.5 first:pt-0 last:pb-0">
                 <div>
@@ -316,7 +299,7 @@ export default function AccountPage() {
         </div>
 
       </div>
-    </div>
+    // </div>
   )
 }
 
