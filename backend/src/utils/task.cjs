@@ -13,17 +13,9 @@ const calculatePriority = (deadline) => {
 }
 
 const fetchTask = async(id) => {
-    if(!id) {
-        return res.status(400)
-        .json({
-            message: "User not authorized to fetch tasks."
-        })
-    }
     const tasks = await Task.find({
         userId: id
     }).sort({deadline: 1})
-
-    console.log(tasks);
 
     await Promise.all(tasks.map(async(task) => {
         const newPriority = calculatePriority(task.deadline);
@@ -35,7 +27,6 @@ const fetchTask = async(id) => {
             )
         }
     }))
-    console.log(tasks);
     return tasks;
 }
 module.exports = {

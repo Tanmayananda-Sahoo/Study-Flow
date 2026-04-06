@@ -1,7 +1,8 @@
 const {Timetable} = require("../models/timetable.models.cjs");
 const {fetchFreeSlots, getNextDateForDay, formatDay} = require("../utils/timeTable.cjs");
 const {fetchTask} = require("../utils/task.cjs");
-
+const {Task} = require('../models/task.models.cjs');
+const {convertToMinutes, minutesToTime} = require('../utils/general.cjs');
 //complete and tested
 const addTimeTableEntry = async (req, res) => {
   const { title, day, startTime, endTime, isRecurring, venue } = req.body;
@@ -114,29 +115,57 @@ const getFreeSlots = async (req, res) => {
 };
 
 
-const generateSchedule = async () => {
-  const priorityMap = { HIGH: 3, MEDIUM: 2, LOW: 1 };
-  const freeSlots = await fetchFreeSlots();
-  const tasks = await fetchTask();
+const generateSchedule = async (req,res) => {
+  const priorityMap = { 'High': 3, 'Medium': 2, 'Low': 1 };
+  const id = req.user._id;
+  const freeSlots = await fetchFreeSlots(id);
+  const tasks = await fetchTask(id);
 
-  tasks.sort((a, b) => priorityMap[b.priority] - priorityMap[a.priority]);
+  const pendingTasks = tasks.filter(
+    task => task.completionStatus === "Pending"
+  );
 
+  // Priority ranking
+  const priorityRank = {
+    'High': 3,
+    'Medium': 2,
+    'Low': 1
+  };
+  
+  // Sort tasks by priority
+  pendingTasks.sort(
+    (a, b) => priorityRank[b.priorityStatus] - priorityRank[a.priorityStatus]
+  );
+  
+  // console.log("Pending Task: ", pendingTasks);
   const schedule = [];
 
-  for (const task of tasks) {
-    for (const slot of freeSlots) {
-      const slotDuration = slot.end - slot.start;
+  for (const slot of freeSlots) {
 
-      if (slotDuration >= task.duration) {
+    console.log("Slot: ", slot);
+    let slotStart = convertToMinutes(slot.start);
+    let slotEnd = convertToMinutes(slot.end);
+    
+    for (const task of pendingTasks) {
+
+      if(task.scheduled) continue;
+      console.log("Task: ", task);
+      const taskDuration = Number(task.time);
+
+      if (slotStart + taskDuration <= slotEnd) {
+
         schedule.push({
-          task: task.title,
-          start: slot.start,
-          end: slot.start + task.duration,
+          taskId: task._id,
+          title: task.title,
+          subject: task.subject,
+          startTime: minutesToTime(slotStart),
+          endTime: minutesToTime(slotStart + taskDuration),
+          priorityStatus: task.priorityStatus
         });
 
-        slot.start += task.duration;
+        slotStart += taskDuration;
 
-        break;
+        task.scheduled = false;
       }
     }
   }

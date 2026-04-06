@@ -57,12 +57,6 @@ const formatDay = (dayNumber) => {
 // }
 
 const fetchFreeSlots = async(id) => {
-  if (!id) {
-    return res.status(400).json({
-      message: "User not authenticated.",
-    });
-  }
-
   const today = new Date();
   const todayDay = formatDay(today.getDay());
 
@@ -110,7 +104,7 @@ const fetchFreeSlots = async(id) => {
       end: endOfDay,
     });
   }
-  console.log(freeSlots);
+  // console.log(freeSlots);
   return freeSlots;
 }
 

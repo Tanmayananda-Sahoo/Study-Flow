@@ -35,6 +35,10 @@ const taskSchema = new mongoose.Schema({
     },
     endTime: {
         type: String
+    },
+    scheduled: {
+        type: Boolean,
+        default: false
     }
 })
 

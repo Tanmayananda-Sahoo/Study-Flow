@@ -34,7 +34,11 @@ const getTodayTimeTable = async() => {
         console.error(error);
     }
 }
-
+const getSchedule = async() => {
+    const response = await timeTableAxiosInstance.get('/get/schedule');
+    console.log("Get Schedule response: ", response);
+    return response;    
+}
 export {
     addTimeTable,
     getTimeTable,
