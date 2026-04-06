@@ -7,7 +7,6 @@ const timetableSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
-
     
     dayOfWeek: {
       type: String,

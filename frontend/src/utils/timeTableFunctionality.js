@@ -3,7 +3,8 @@ import timeTableAxiosInstance from './timeTableAxios.js';
 const addTimeTable = async(timeTableData) => {
     try {
         const response = await timeTableAxiosInstance.post('/add', timeTableData);
-        console.log(response);
+        console.log("Time table entry: ",response);
+        return response;
     } catch (error) {
         console.error(error);
     }
@@ -12,6 +13,7 @@ const getTimeTable = async() => {
     try {
         const response = await timeTableAxiosInstance.get('/get');
         console.log("Time Table: ", response);
+        return response;
     } catch (error) {
         console.error(error);
     }
@@ -35,13 +37,18 @@ const getTodayTimeTable = async() => {
     }
 }
 const getSchedule = async() => {
-    const response = await timeTableAxiosInstance.get('/get/schedule');
-    console.log("Get Schedule response: ", response);
-    return response;    
+    try {
+        const response = await timeTableAxiosInstance.get('/get/schedule');
+        console.log("Get Schedule response: ", response);
+        return response;  
+    } catch (error) {
+        console.error(error);
+    }
 }
 export {
     addTimeTable,
     getTimeTable,
     getFreeSlots,
-    getTodayTimeTable
+    getTodayTimeTable,
+    getSchedule
 }

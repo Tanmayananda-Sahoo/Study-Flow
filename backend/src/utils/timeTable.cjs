@@ -136,10 +136,37 @@ function getNextDateForDay(dayName) {
 
   return resultDate.toLocaleDateString("en-GB");
 }
+
+async function fetchTodayTimeTable(id){
+  try {
+      let today = new Date();
+        const todayDay = today.getDay();
+    
+        let startOfDay = new Date(today.setHours(0, 0, 0, 0));
+        let endOfDay = new Date(today.setHours(23, 59, 59, 999));
+    
+        const todayDate = today.toLocaleDateString("en-GB");
+        startOfDay = startOfDay.toLocaleDateString("en-GB");
+        endOfDay = endOfDay.toLocaleDateString("en-GB");
+    
+        const timeTable = await Timetable.find({
+          userId: id,
+          $or: [
+            { isRecurring: true, dayOfWeek: formatDay(today.getDay())},
+            { specificDate: todayDate, isRecurring: false },
+          ],
+        }).sort({ startTime: 1 });
+
+        return timeTable;
+  } catch (error) {
+    console.error(error)
+  }
+}
 module.exports = {
   convertToMinutes,
   sortSchedules,
   fetchFreeSlots,
   getNextDateForDay,
-  formatDay
+  formatDay,
+  fetchTodayTimeTable
 };

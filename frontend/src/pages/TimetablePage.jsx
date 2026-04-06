@@ -1,113 +1,114 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import TimetableGrid, { COLOR_CYCLE } from "../components/TimetableGrid";
 import Icon from "../components/Icon";
+import { addTimeTable, getTimeTable } from "../utils/timeTableFunctionality";
 
 const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
 
 // Seed data so the grid isn't empty on first load
 //Here backend time table will be fed.
-const SEED_CLASSES = [
-  {
-    id: 1,
-    day: "Monday",
-    start: "09:00",
-    end: "10:30",
-    name: "Advanced Math",
-    venue: "A-204",
-    color: "blue",
-    repeats: true,
-  },
-  {
-    id: 2,
-    day: "Monday",
-    start: "14:00",
-    end: "16:00",
-    name: "Physics Lab",
-    venue: "Lab D-1",
-    color: "orange",
-    repeats: false,
-  },
-  {
-    id: 3,
-    day: "Tuesday",
-    start: "10:00",
-    end: "12:00",
-    name: "Organic Chem",
-    venue: "B-108",
-    color: "green",
-    repeats: true,
-  },
-  {
-    id: 4,
-    day: "Tuesday",
-    start: "13:00",
-    end: "14:00",
-    name: "Statistics",
-    venue: "A-101",
-    color: "blue",
-    repeats: true,
-  },
-  {
-    id: 5,
-    day: "Wednesday",
-    start: "08:00",
-    end: "10:00",
-    name: "Calculus",
-    venue: "C-203",
-    color: "orange",
-    repeats: true,
-  },
-  {
-    id: 6,
-    day: "Wednesday",
-    start: "12:00",
-    end: "14:00",
-    name: "English Lit",
-    venue: "C-301",
-    color: "green",
-    repeats: false,
-  },
-  {
-    id: 7,
-    day: "Thursday",
-    start: "09:00",
-    end: "12:00",
-    name: "Research Lab",
-    venue: "Lab E-2",
-    color: "purple",
-    repeats: true,
-  },
-  {
-    id: 8,
-    day: "Thursday",
-    start: "14:00",
-    end: "16:00",
-    name: "Seminar",
-    venue: "Hall B",
-    color: "blue",
-    repeats: false,
-  },
-  {
-    id: 9,
-    day: "Friday",
-    start: "10:00",
-    end: "12:00",
-    name: "Data Science",
-    venue: "Lab C-3",
-    color: "orange",
-    repeats: true,
-  },
-  {
-    id: 10,
-    day: "Friday",
-    start: "13:00",
-    end: "14:00",
-    name: "Office Hours",
-    venue: "Prof. Rm",
-    color: "green",
-    repeats: false,
-  },
-];
+// const SEED_CLASSES = [
+//   {
+//     id: 1,
+//     day: "Monday",
+//     start: "09:00",
+//     end: "10:30",
+//     name: "Advanced Math",
+//     venue: "A-204",
+//     color: "blue",
+//     repeats: true,
+//   },
+//   {
+//     id: 2,
+//     day: "Monday",
+//     start: "14:00",
+//     end: "16:00",
+//     name: "Physics Lab",
+//     venue: "Lab D-1",
+//     color: "orange",
+//     repeats: false,
+//   },
+//   {
+//     id: 3,
+//     day: "Tuesday",
+//     start: "10:00",
+//     end: "12:00",
+//     name: "Organic Chem",
+//     venue: "B-108",
+//     color: "green",
+//     repeats: true,
+//   },
+//   {
+//     id: 4,
+//     day: "Tuesday",
+//     start: "13:00",
+//     end: "14:00",
+//     name: "Statistics",
+//     venue: "A-101",
+//     color: "blue",
+//     repeats: true,
+//   },
+//   {
+//     id: 5,
+//     day: "Wednesday",
+//     start: "08:00",
+//     end: "10:00",
+//     name: "Calculus",
+//     venue: "C-203",
+//     color: "orange",
+//     repeats: true,
+//   },
+//   {
+//     id: 6,
+//     day: "Wednesday",
+//     start: "12:00",
+//     end: "14:00",
+//     name: "English Lit",
+//     venue: "C-301",
+//     color: "green",
+//     repeats: false,
+//   },
+//   {
+//     id: 7,
+//     day: "Thursday",
+//     start: "09:00",
+//     end: "12:00",
+//     name: "Research Lab",
+//     venue: "Lab E-2",
+//     color: "purple",
+//     repeats: true,
+//   },
+//   {
+//     id: 8,
+//     day: "Thursday",
+//     start: "14:00",
+//     end: "16:00",
+//     name: "Seminar",
+//     venue: "Hall B",
+//     color: "blue",
+//     repeats: false,
+//   },
+//   {
+//     id: 9,
+//     day: "Friday",
+//     start: "10:00",
+//     end: "12:00",
+//     name: "Data Science",
+//     venue: "Lab C-3",
+//     color: "orange",
+//     repeats: true,
+//   },
+//   {
+//     id: 10,
+//     day: "Friday",
+//     start: "13:00",
+//     end: "14:00",
+//     name: "Office Hours",
+//     venue: "Prof. Rm",
+//     color: "green",
+//     repeats: false,
+//   },
+// ];
 
 const EMPTY_FORM = {
   title: "",
@@ -119,7 +120,7 @@ const EMPTY_FORM = {
 };
 
 export default function TimetablePage() {
-  const [classes, setClasses] = useState(SEED_CLASSES);
+  const [classes, setClasses] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [form, setForm] = useState(EMPTY_FORM);
   const [title, setTitle] = useState("");
@@ -130,7 +131,17 @@ export default function TimetablePage() {
   const [endTime, setEndTime] = useState("");
   const [errors, setErrors] = useState({});
   const [focused, setFocused] = useState(null);
+  
 
+  useEffect(() => {
+    async function loadData() {
+      const response = await getTimeTable();
+      console.log("Use effect time table: ",response);
+      setClasses(response.data.TimeTable);
+    }
+
+    loadData();
+  },[])
   // const set = (field) => (e) =>
   //   setForm((prev) => ({ ...prev, [field]: e.target.value }));
 
@@ -160,7 +171,7 @@ export default function TimetablePage() {
     return e;
   };
 
-  const handleAdd = () => {
+  const handleAdd = async() => {
     const e = validate();
     if (Object.keys(e).length) {
       setErrors(e);
@@ -168,17 +179,18 @@ export default function TimetablePage() {
     }
 
     const color = COLOR_CYCLE[classes.length % COLOR_CYCLE.length];
-    const userData = {
-      id: Date.now(),
-      day: day,
-      start: startTime,
-      end: endTime,
-      name: title,
-      venue: venue,
-      color,
-      repeats: isRecurring,
+    const timeTableData = {
+      day,
+      startTime,
+      endTime,
+      title,
+      venue,
+      isRecurring
     };
-    setClasses((prev) => [...prev, newClass]);
+
+    const response = await addTimeTable(timeTableData);
+    console.log("Use effect response: ", response);
+    setClasses((prev) => [...prev, timeTableData]);
     setForm(EMPTY_FORM);
     setErrors({});
     setShowModal(false);
@@ -424,19 +436,9 @@ export default function TimetablePage() {
               className="flex items-center gap-1.5 text-xs text-ink-muted"
             >
               <div
-                className={`w-2.5 h-2.5 rounded-full ${
-                  c.color === "blue"
-                    ? "bg-accent"
-                    : c.color === "orange"
-                      ? "bg-orange-400"
-                      : c.color === "green"
-                        ? "bg-green-500"
-                        : c.color === "purple"
-                          ? "bg-purple-400"
-                          : "bg-rose-400"
-                }`}
+                className={`w-2.5 h-2.5 rounded-full `}
               />
-              {c.name}
+              {c.title}
             </div>
           ))}
           {classes.length > 5 && (

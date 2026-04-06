@@ -57,11 +57,11 @@ export default function TimetableGrid({ classes = [], onDelete }) {
 
           {/* Day cells */}
           {DAYS.map(day => {
-            const cls = classes.find(c => c.day === day && Math.round(timeToIndex(c.start)) === hi)
+            const cls = classes.find(c => c.dayOfWeek === day && Math.round(timeToIndex(c.startTime)) === hi)
             const occupied = !cls && classes.find(c => {
-              const s = Math.round(timeToIndex(c.start))
-              const span = spanFromTimes(c.start, c.end)
-              return c.day === day && s < hi && s + span > hi
+              const s = Math.round(timeToIndex(c.startTime))
+              const span = spanFromTimes(c.startTime, c.endTime)
+              return c.dayOfWeek === day && s < hi && s + span > hi
             })
 
             if (cls) {
